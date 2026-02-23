@@ -1,20 +1,37 @@
 import { motion } from 'framer-motion';
 import { Mail, Phone, MapPin, Github, Linkedin, Send } from 'lucide-react';
-import { personalInfo } from '../data/portfolio';
 import { useState } from 'react';
+import { personalInfo } from '../data/portfolio';
+import LiquidEther from './LiquidEther';
 
 const Contact = () => {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [sent, setSent] = useState(false);
+  const [status, setStatus] = useState('idle'); // idle | sending | sent | error
 
   const handleChange = e => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSubmit = e => {
+  const handleSubmit = async e => {
     e.preventDefault();
-    const mailtoLink = `mailto:${personalInfo.email}?subject=Message de ${formData.name}&body=${encodeURIComponent(formData.message)}%0A%0ADe: ${formData.email}`;
-    window.open(mailtoLink);
-    setSent(true);
-    setTimeout(() => setSent(false), 3000);
+    setStatus('sending');
+
+    try {
+      const res = await fetch('https://formspree.io/f/mpqjokbe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+        body: JSON.stringify({ name: formData.name, email: formData.email, message: formData.message }),
+      });
+      if (res.ok) {
+        setStatus('sent');
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => setStatus('idle'), 4000);
+      } else {
+        setStatus('error');
+        setTimeout(() => setStatus('idle'), 4000);
+      }
+    } catch {
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 4000);
+    }
   };
 
   const contactItems = [
@@ -28,8 +45,26 @@ const Contact = () => {
     { icon: <Linkedin size={22} />, label: 'LinkedIn', href: personalInfo.linkedin },
   ];
 
+  const inputStyle = {
+    background: 'rgba(255,255,255,0.05)',
+    border: '1px solid rgba(255,255,255,0.1)',
+  };
+
   return (
     <section id="contact" className="py-20 relative overflow-hidden">
+
+      {/* LiquidEther en fond */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <LiquidEther
+          colors={['#FF6B35', '#F7931E', '#FDC830']}
+          mouseForce={15}
+          cursorSize={80}
+          resolution={0.4}
+          autoDemo
+          autoSpeed={0.4}
+          autoIntensity={1.8}
+        />
+      </div>
 
       {/* Fond animé */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
@@ -48,7 +83,7 @@ const Contact = () => {
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
             <span className="text-gradient">Contact</span>
           </h2>
-          <p className="text-gray-400 text-lg">Disponible pour une alternance — parlons-en !</p>
+          <p className="text-gray-400 text-lg">Disponible pour une alternance – parlons-en !</p>
           <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-4 rounded-full"></div>
         </motion.div>
 
@@ -138,7 +173,7 @@ const Contact = () => {
                     required
                     placeholder="Jean Dupont"
                     className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 outline-none transition-all"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    style={inputStyle}
                     onFocus={e => e.target.style.borderColor = 'rgba(14, 165, 233, 0.5)'}
                     onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                   />
@@ -152,9 +187,9 @@ const Contact = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    placeholder="eliahoubenamous@gmail.com"
+                    placeholder="exemple@email.com"
                     className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 outline-none transition-all"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    style={inputStyle}
                     onFocus={e => e.target.style.borderColor = 'rgba(14, 165, 233, 0.5)'}
                     onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                   />
@@ -170,7 +205,7 @@ const Contact = () => {
                     rows={5}
                     placeholder="Votre message..."
                     className="w-full px-4 py-3 rounded-xl text-white placeholder-gray-500 outline-none transition-all resize-none"
-                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)' }}
+                    style={inputStyle}
                     onFocus={e => e.target.style.borderColor = 'rgba(14, 165, 233, 0.5)'}
                     onBlur={e => e.target.style.borderColor = 'rgba(255,255,255,0.1)'}
                   />
@@ -178,11 +213,22 @@ const Contact = () => {
 
                 <button
                   type="submit"
-                  className="w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98]"
-                  style={{ background: sent ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #0ea5e9, #8b5cf6)', boxShadow: '0 0 30px rgba(14, 165, 233, 0.3)' }}
+                  disabled={status === 'sending'}
+                  className="w-full py-4 rounded-xl font-bold text-white flex items-center justify-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                  style={{
+                    background: status === 'sent'
+                      ? 'linear-gradient(135deg, #10b981, #059669)'
+                      : status === 'error'
+                      ? 'linear-gradient(135deg, #ef4444, #dc2626)'
+                      : 'linear-gradient(135deg, #0ea5e9, #8b5cf6)',
+                    boxShadow: '0 0 30px rgba(14, 165, 233, 0.3)',
+                  }}
                 >
                   <Send size={20} />
-                  {sent ? 'Message envoyé !' : 'Envoyer le message'}
+                  {status === 'sending' && 'Envoi en cours...'}
+                  {status === 'sent' && 'Message envoyé !'}
+                  {status === 'error' && 'Erreur, réessayez'}
+                  {status === 'idle' && 'Envoyer le message'}
                 </button>
               </form>
             </div>

@@ -1,12 +1,26 @@
-import { motion } from 'framer-motion';
-import { Briefcase, Calendar, MapPin } from 'lucide-react';
+﻿import { motion } from 'framer-motion';
+import { Briefcase, Calendar, MapPin , Clock } from 'lucide-react';
 import { experiences } from '../data/portfolio';
+import LiquidEther from './LiquidEther';
 
 const Experience = () => {
   return (
     <section id="experience" className="py-20 relative overflow-hidden">
 
-      {/* Fond animé */}
+      {/* LiquidEther en fond */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <LiquidEther
+          colors={['#FF6B35', '#F7931E', '#FDC830']}
+          mouseForce={15}
+          cursorSize={80}
+          resolution={0.4}
+          autoDemo
+          autoSpeed={0.4}
+          autoIntensity={1.8}
+        />
+      </div>
+
+      {/* Fond animÃ© */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
         <div className="absolute rounded-full blur-3xl animate-float" style={{ width: '500px', height: '500px', background: 'rgba(14, 165, 233, 0.08)', top: '-20%', right: '-10%' }}></div>
         <div className="absolute rounded-full blur-3xl animate-float" style={{ width: '400px', height: '400px', background: 'rgba(139, 92, 246, 0.08)', bottom: '-10%', left: '-5%', animationDelay: '2s' }}></div>
@@ -21,33 +35,24 @@ const Experience = () => {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="text-gradient">Expériences</span>
+            <span className="text-gradient">Experiences</span>
           </h2>
           <p className="text-gray-400 text-lg">Mon parcours professionnel</p>
           <div className="w-24 h-1 bg-gradient-to-r from-primary to-secondary mx-auto mt-4 rounded-full"></div>
         </motion.div>
 
-        <div className="max-w-4xl mx-auto relative">
-          {/* Ligne verticale centrale */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-primary via-secondary to-primary opacity-30 hidden md:block" style={{ transform: 'translateX(-50%)' }}></div>
-
-          {experiences.map((exp, index) => (
-            <motion.div
-              key={exp.id}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -60 : 60 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.2, duration: 0.6 }}
-              className={`relative mb-12 md:w-1/2 ${index % 2 === 0 ? 'md:pr-12 md:ml-0' : 'md:pl-12 md:ml-auto'}`}
-            >
-              {/* Point sur la ligne */}
-              <div className="absolute top-6 hidden md:block"
-                style={{ [index % 2 === 0 ? 'right' : 'left']: '-1.5rem', width: '12px', height: '12px', borderRadius: '50%', background: 'linear-gradient(to right, #0ea5e9, #8b5cf6)', boxShadow: '0 0 10px rgba(14, 165, 233, 0.8)' }}>
-              </div>
-
-              <div className="glass rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group border border-white/5 hover:border-primary/30"
-                style={{ backdropFilter: 'blur(20px)' }}>
-
+        <div className="max-w-5xl mx-auto">
+          {experiences.map((exp, index) => {
+            const isEven = index % 2 === 0;
+            const card = (
+              <motion.div
+                initial={{ opacity: 0, x: isEven ? -50 : 50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2, duration: 0.6 }}
+                className="glass rounded-2xl p-6 hover:bg-white/10 transition-all duration-300 group border border-white/5 hover:border-primary/30"
+                style={{ backdropFilter: 'blur(20px)' }}
+              >
                 {/* Header */}
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform shadow-lg">
@@ -57,28 +62,22 @@ const Experience = () => {
                     <h3 className="text-xl font-bold text-white mb-1">{exp.title}</h3>
                     <p className="text-primary font-semibold text-lg">{exp.company}</p>
                   </div>
-                  <span className="text-xs px-3 py-1 rounded-full border border-secondary/50 text-secondary bg-secondary/10">
+                  <span className="text-xs px-3 py-1 rounded-full border border-secondary/50 text-secondary bg-secondary/10 whitespace-nowrap">
                     {exp.type}
                   </span>
                 </div>
 
-                {/* Infos */}
-                <div className="flex flex-wrap gap-3 mb-4">
-                  <div className="flex items-center gap-2 text-gray-400 text-sm">
-                    <Calendar size={14} className="text-primary" />
-                    <span>{exp.period}</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-gray-400 text-sm">
-                    <MapPin size={14} className="text-primary" />
-                    <span>{exp.location}</span>
-                  </div>
+                {/* Location */}
+                <div className="flex items-center gap-2 text-gray-400 text-sm mb-4">
+                  <MapPin size={14} className="text-primary" />
+                  <span>{exp.location}</span>
                 </div>
 
                 {/* Description */}
                 <ul className="space-y-2 mb-4">
                   {exp.description.map((item, i) => (
                     <li key={i} className="text-gray-300 text-sm flex items-start gap-2">
-                      <span className="text-primary mt-1 flex-shrink-0">▸</span>
+                      <span className="text-primary mt-1 flex-shrink-0">›</span>
                       <span>{item}</span>
                     </li>
                   ))}
@@ -92,9 +91,49 @@ const Experience = () => {
                     </span>
                   ))}
                 </div>
+              </motion.div>
+            );
+
+            const dateLabel = (
+              <motion.div
+                initial={{ opacity: 0, x: isEven ? 50 : -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 + 0.1, duration: 0.5 }}
+                className={`hidden md:flex flex-col gap-1 pt-5 ${isEven ? 'items-start pl-4' : 'items-end pr-4'}`}
+              >
+                <span className="text-sm font-bold" style={{ color: '#0ea5e9' }}>
+                  {exp.period}
+                </span>
+                {exp.duration && (
+                  <span className="text-xs text-gray-500 flex items-center gap-1">
+                    <Clock size={11} />
+                    {exp.duration}
+                  </span>
+                )}
+              </motion.div>
+            );
+
+            return (
+              <div key={exp.id} className="flex items-start mb-12 gap-0">
+                {/* Colonne gauche */}
+                <div className="flex-1">
+                  {isEven ? card : dateLabel}
+                </div>
+
+                {/* Ligne + point central */}
+                <div className="hidden md:flex flex-col items-center mx-4 pt-6" style={{ minWidth: '24px' }}>
+                  <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: 'linear-gradient(135deg, #0ea5e9, #8b5cf6)', boxShadow: '0 0 12px rgba(14, 165, 233, 0.8)', flexShrink: 0 }} />
+                  <div className="flex-1 w-px mt-2" style={{ background: 'linear-gradient(to bottom, rgba(14,165,233,0.4), rgba(139,92,246,0.1))', minHeight: '60px' }} />
+                </div>
+
+                {/* Colonne droite */}
+                <div className="flex-1">
+                  {isEven ? dateLabel : card}
+                </div>
               </div>
-            </motion.div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -102,3 +141,7 @@ const Experience = () => {
 };
 
 export default Experience;
+
+
+
+

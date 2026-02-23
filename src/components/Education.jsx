@@ -1,10 +1,24 @@
 import { motion } from 'framer-motion';
 import { GraduationCap, Calendar, MapPin, Award } from 'lucide-react';
 import { education } from '../data/portfolio';
+import LiquidEther from './LiquidEther';
 
 const Education = () => {
   return (
     <section id="education" className="py-20 relative overflow-hidden">
+
+      {/* LiquidEther en fond */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <LiquidEther
+          colors={['#FF6B35', '#F7931E', '#FDC830']}
+          mouseForce={15}
+          cursorSize={80}
+          resolution={0.4}
+          autoDemo
+          autoSpeed={0.4}
+          autoIntensity={1.8}
+        />
+      </div>
 
       {/* Fond animé */}
       <div style={{ position: 'absolute', inset: 0, zIndex: 0, overflow: 'hidden' }}>
@@ -100,6 +114,7 @@ const Education = () => {
             </motion.div>
           ))}
         </div>
+
       </div>
     </section>
   );

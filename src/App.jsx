@@ -1,27 +1,41 @@
-﻿import Navbar from './components/Navbar';
+﻿import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
+import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import Experience from './components/Experience';
+import Certifications from './components/Certifications';
 import Skills from './components/Skills';
 import Education from './components/Education';
 import Contact from './components/Contact';
-import Footer from './components/Footer';
-import Scene3D from './components/Scene3D';
-import './index.css';
+import Preloader from './components/Preloader';
 
 function App() {
+  const [isLoading, setIsLoading] = useState(true);
+
+  const handleLoadingComplete = () => {
+    setIsLoading(false);
+  };
+
   return (
-    <div className="relative min-h-screen">
-      <Scene3D />
-      <Navbar />
-      <main>
-        <Hero />
-        <Experience />
-        <Skills />
-        <Education />
-        <Contact />
-      </main>
-      <Footer />
-    </div>
+    <>
+      <AnimatePresence mode="wait">
+        {isLoading && (
+          <Preloader key="preloader" onLoadingComplete={handleLoadingComplete} />
+        )}
+      </AnimatePresence>
+
+      {!isLoading && (
+        <div className="App">
+          <Navbar />
+          <Hero />
+          <Experience />
+          <Certifications />
+          <Skills />
+          <Education />
+          <Contact />
+        </div>
+      )}
+    </>
   );
 }
 
